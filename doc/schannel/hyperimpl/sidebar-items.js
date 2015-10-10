@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Schannel","Schannel context for usage in hyper, providing ssl related configuration"]]});
