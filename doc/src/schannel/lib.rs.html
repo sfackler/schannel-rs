@@ -907,7 +907,7 @@
 <span class='doccomment'>/// SSL certificate conditions</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SslCertCondition</span>
 {
-    <span class='doccomment'>/// Check if the sha1 thumbprint of a certificate matches a given string</span>
+    <span class='doccomment'>/// Check if the sha1 thumbprint hash of a certificate matches a given string</span>
     <span class='ident'>SHA1HashIdentical</span>(<span class='ident'>String</span>),
     <span class='doccomment'>/// Check if the subject name contains a given string</span>
     <span class='ident'>SubjectContains</span>(<span class='ident'>String</span>)
