@@ -794,6 +794,11 @@
 <span id="752">752</span>
 <span id="753">753</span>
 <span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Schannel is a pure-Rust wrapper to provide SSL functionality under windows by using schannel, which</span>
 <span class='doccomment'>//! removes the requirement of openssl.</span>
@@ -863,7 +868,9 @@
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SslInfo</span> {
+    <span class='doccomment'>/// Configuration related to SSL clients</span>
     <span class='ident'>Client</span>(<span class='ident'>SslInfoClient</span>),
+    <span class='doccomment'>/// Configuration related to SSL servers</span>
     <span class='ident'>Server</span>(<span class='ident'>SslInfoServer</span>)
 }
 
@@ -897,9 +904,12 @@
     <span class='ident'>User</span>
 }
 
+<span class='doccomment'>/// SSL certificate conditions</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SslCertCondition</span>
 {
+    <span class='doccomment'>/// Check if the sha1 thumbprint of a certificate matches a given string</span>
     <span class='ident'>SHA1HashIdentical</span>(<span class='ident'>String</span>),
+    <span class='doccomment'>/// Check if the subject name contains a given string</span>
     <span class='ident'>SubjectContains</span>(<span class='ident'>String</span>)
 }
 

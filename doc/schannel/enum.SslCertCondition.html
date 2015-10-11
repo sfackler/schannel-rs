@@ -45,12 +45,15 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-156' class='srclink' href='../src/schannel/lib.rs.html#103-107' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-156' class='srclink' href='../src/schannel/lib.rs.html#106-112' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum SslCertCondition {
     SHA1HashIdentical(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
     SubjectContains(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
-}</pre><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.SHA1HashIdentical'><code>SHA1HashIdentical</code></td><td></td></tr><tr><td id='variant.SubjectContains'><code>SubjectContains</code></td><td></td></tr></table></section>
+}</pre><div class='docblock'><p>SSL certificate conditions</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.SHA1HashIdentical'><code>SHA1HashIdentical</code></td><td><div class='docblock'><p>Check if the sha1 thumbprint of a certificate matches a given string</p>
+</div></td></tr><tr><td id='variant.SubjectContains'><code>SubjectContains</code></td><td><div class='docblock'><p>Check if the subject name contains a given string</p>
+</div></td></tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
