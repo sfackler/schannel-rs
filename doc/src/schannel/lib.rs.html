@@ -799,6 +799,10 @@
 <span id="757">757</span>
 <span id="758">758</span>
 <span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Schannel is a pure-Rust wrapper to provide SSL functionality under windows by using schannel, which</span>
 <span class='doccomment'>//! removes the requirement of openssl.</span>
@@ -819,6 +823,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>IoError</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStr</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>windows</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStrExt</span>;
@@ -853,18 +858,17 @@
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>CERT_FIND_SUBJECT_STR</span>: <span class='ident'>DWORD</span> <span class='op'>=</span> <span class='ident'>CERT_COMPARE_NAME_STR_W</span> <span class='op'>&lt;&lt;</span> <span class='ident'>CERT_COMPARE_SHIFT</span> <span class='op'>|</span> <span class='ident'>CERT_INFO_SUBJECT_FLAG</span>;
 
 <span class='comment'>// TODO: General error handling and checks (if initialized for credential, stream_sizes, ...)</span>
-<span class='comment'>// TODO: renegotiation, disconnect</span>
-<span class='comment'>// TODO: Manual certificate validation, respect disable_peer_verification</span>
-<span class='comment'>// TODO: Find out while sometimes certificate loading fails</span>
+<span class='comment'>// TODO: renegotiation, disconnect?</span>
+<span class='comment'>// TODO: Manual certificate validation</span>
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SchannelCertStore</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>);
+<span class='kw'>struct</span> <span class='ident'>SchannelCertStore</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>);
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SchannelCertCtxt</span>(<span class='op'>*</span><span class='kw'>const</span> <span class='ident'>winapi</span>::<span class='ident'>wincrypt</span>::<span class='ident'>CERT_CONTEXT</span>);
+<span class='kw'>struct</span> <span class='ident'>SchannelCertCtxt</span>(<span class='op'>*</span><span class='kw'>const</span> <span class='ident'>winapi</span>::<span class='ident'>wincrypt</span>::<span class='ident'>CERT_CONTEXT</span>);
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SchannelCredHandle</span>(<span class='ident'>CredHandle</span>);
+<span class='kw'>struct</span> <span class='ident'>SchannelCredHandle</span>(<span class='ident'>CredHandle</span>);
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SchannelCtxtHandle</span>(<span class='ident'>CtxtHandle</span>);
+<span class='kw'>struct</span> <span class='ident'>SchannelCtxtHandle</span>(<span class='ident'>CtxtHandle</span>);
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SslInfo</span> {
@@ -1482,6 +1486,10 @@
             <span class='ident'>SecBuffer</span> { <span class='ident'>BufferType</span>: <span class='ident'>SECBUFFER_EMPTY</span>, <span class='ident'>cbBuffer</span>: <span class='number'>0</span>, <span class='ident'>pvBuffer</span>: <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>() }
         ];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>SecBufferDesc</span> { <span class='ident'>ulVersion</span>: <span class='ident'>SECBUFFER_VERSION</span>, <span class='ident'>cBuffers</span>: <span class='number'>4</span>, <span class='ident'>pBuffers</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buffers</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>SecBuffer</span> };
+
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>stream_sizes</span>.<span class='ident'>cbHeader</span> <span class='op'>==</span> <span class='number'>0</span> {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>IoError</span>::<span class='ident'>new</span>(<span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;SSLStream doesn&#39;t seem initialized. Maybe you forgot to call .init?&quot;</span>));
+        }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buffer</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span> <span class='kw'>as</span> <span class='ident'>u8</span>; <span class='self'>self</span>.<span class='ident'>stream_sizes</span>.<span class='ident'>cbHeader</span> <span class='kw'>as</span> <span class='ident'>usize</span>];
         <span class='ident'>buffer</span>.<span class='ident'>extend</span>(<span class='ident'>buf</span>.<span class='ident'>iter</span>().<span class='ident'>cloned</span>());
