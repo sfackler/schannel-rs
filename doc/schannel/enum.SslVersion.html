@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `SslCertCondition` enum in crate `schannel`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, SslCertCondition">
+    <meta name="description" content="API documentation for the Rust `SslVersion` enum in crate `schannel`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SslVersion">
 
-    <title>schannel::SslCertCondition - Rust</title>
+    <title>schannel::SslVersion - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../main.css">
 
@@ -26,7 +26,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='index.html'>schannel</a></p><script>window.sidebarCurrent = {name: 'SslCertCondition', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='index.html'>schannel</a></p><script>window.sidebarCurrent = {name: 'SslVersion', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -41,19 +41,24 @@
     </nav>
 
     <section id='main' class="content enum">
-<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>schannel</a>::<wbr><a class='enum' href=''>SslCertCondition</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>schannel</a>::<wbr><a class='enum' href=''>SslVersion</a></span><span class='out-of-band'><span id='render-detail'>
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-165' class='srclink' href='../src/schannel/lib.rs.html#124-130' title='goto source code'>[src]</a></span></h1>
-<pre class='rust enum'>pub enum SslCertCondition {
-    SHA1HashIdentical(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
-    SubjectContains(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
-}</pre><div class='docblock'><p>SSL certificate conditions</p>
-</div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.SHA1HashIdentical'><code>SHA1HashIdentical</code></td><td><div class='docblock'><p>Check if the sha1 thumbprint hash of a certificate matches a given string</p>
-</div></td></tr><tr><td id='variant.SubjectContains'><code>SubjectContains</code></td><td><div class='docblock'><p>Check if the subject name contains a given string</p>
-</div></td></tr></table></section>
+        </span><a id='src-232' class='srclink' href='../src/schannel/lib.rs.html#174-185' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum SslVersion {
+    All,
+    Tls1,
+    Tls10,
+    Tls11,
+    Tls12,
+    Ssl2,
+    Ssl3,
+}</pre><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.All'><code>All</code></td><td><div class='docblock'><p>Allow any SSL version</p>
+</div></td></tr><tr><td id='variant.Tls1'><code>Tls1</code></td><td><div class='docblock'><p>Allow every SSL version, which is atleast TLSv1 (default)</p>
+</div></td></tr><tr><td id='variant.Tls10'><code>Tls10</code></td><td></td></tr><tr><td id='variant.Tls11'><code>Tls11</code></td><td></td></tr><tr><td id='variant.Tls12'><code>Tls12</code></td><td></td></tr><tr><td id='variant.Ssl2'><code>Ssl2</code></td><td></td></tr><tr><td id='variant.Ssl3'><code>Ssl3</code></td><td></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../schannel/enum.SslVersion.html' title='schannel::SslVersion'>SslVersion</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
