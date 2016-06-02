@@ -3,6 +3,7 @@ extern crate kernel32;
 extern crate libc;
 extern crate secur32;
 extern crate winapi;
+#[cfg(test)] extern crate rustc_serialize;
 
 use libc::c_ulong;
 use std::cmp;
@@ -942,9 +943,11 @@ trait Inner<T> {
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
     use std::io::{Read, Write};
     use std::net::TcpStream;
     use winapi;
+    use rustc_serialize::json;
 
     use super::*;
 
@@ -1075,5 +1078,76 @@ mod test {
             .initialize(creds, stream)
             .unwrap();
         stream.shutdown().unwrap();
+    }
+
+    #[test]
+    fn howsmyssl() {
+        #[derive(RustcDecodable, PartialEq, Eq)]
+        struct HowsMySslResults {
+            given_cipher_suites: Vec<String>,
+            ephemeral_keys_supported: bool,
+            session_ticket_supported: bool,
+            tls_compression_supported: bool,
+            unknown_cipher_suite_supported: bool,
+            beast_vuln: bool,
+            able_to_detect_n_minus_one_splitting: bool,
+            insecure_cipher_suites: HashMap<String, Vec<String>>,
+            tls_version: String,
+            rating: String,
+        }
+
+        let creds = SchannelCredBuilder::new().acquire(Direction::Outbound).unwrap();
+        let stream = TcpStream::connect("www.howsmyssl.com:443").unwrap();
+        let mut stream = TlsStreamBuilder::new()
+            .domain("www.howsmyssl.com")
+            .initialize(creds, stream)
+            .unwrap();
+        stream.write_all(b"GET /a/check HTTP/1.0\r\nHost: www.howsmyssl.com\r\n\r\n").unwrap();
+        let mut out = vec![];
+        stream.read_to_end(&mut out).unwrap();
+        assert!(out.starts_with(b"HTTP/1.0 200 OK"));
+
+        // Retrieve the JSON
+        let mut index = 0;
+        for _ in out.windows(4).take_while(|s| s != &[b'\r', b'\n', b'\r', b'\n']) {
+            index += 1;
+        }
+        let json = String::from_utf8(out[index + 4..].to_owned()).unwrap();
+
+        // Compare the results
+        let results: HowsMySslResults = json::decode(&json).unwrap();
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_256_GCM_SHA384".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_128_GCM_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_256_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_128_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_256_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_AES_128_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_RSA_WITH_3DES_EDE_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_DSS_WITH_AES_256_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_DSS_WITH_AES_128_CBC_SHA256".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_DSS_WITH_AES_256_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_DSS_WITH_AES_128_CBC_SHA".into()));
+        assert!(results.given_cipher_suites.contains(&"TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA".into()));
+        assert!(results.ephemeral_keys_supported);
+        assert!(results.session_ticket_supported);
+        assert!(!results.tls_compression_supported);
+        assert!(!results.unknown_cipher_suite_supported);
+        assert!(!results.beast_vuln);
+        assert!(!results.able_to_detect_n_minus_one_splitting);
+        assert!(results.insecure_cipher_suites.is_empty());
+        assert_eq!(&results.tls_version, "TLS 1.2");
+        assert_eq!(&results.rating, "Probably Okay");
     }
 }
